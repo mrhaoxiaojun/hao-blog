@@ -7,12 +7,12 @@ module.exports = {
           href: `/hao.ico`
       }]
   ],
-  themeConfig: {
-    logo: '/assets/img/logo.png',
-  },
   dest: './docs/.vuepress/dist',
   ga: '',
   evergreen: true,
+  markdown: {
+    lineNumbers: true
+  },
   themeConfig: {
     sidebarDepth: 2, 
     nav: [
@@ -31,9 +31,7 @@ module.exports = {
       {
         text: '课程指南',
         items: [
-          { text: '入门三板斧', link: '/course/hcj/' },
-          { text: '流行框架', link: '/course/frame/' },
-          { text: '计算机通识', link: '/course/basis/' },
+          { text: '吸星大法', link: '/course/main/' },
           { text: '辅助工具', link: '/course/tool/' },
           { text: '面试指南', link: '/course/interview/' },
           { text: '源码解析', link: '/course/sourceCode/' },
@@ -43,12 +41,17 @@ module.exports = {
       {
         text: '其他知识',
         items: [
-          { text: '理财学习', link: '/others/financial/' }
+          { text: '理财学习', link: '/others/financial/' },
+          { text: '书影博客', link: '/others/readingBlog/' },
         ]
       },
       { text: 'Github', link: 'https://github.com/mrhaoxiaojun/' },
     ],
+    '/course/main/':{
+      sidebar:false
+    },
     sidebar: {
+      // 头部导航菜单
       '/why/': [
         {
           title: '市场行情大背景',   // 必要的
@@ -71,75 +74,6 @@ module.exports = {
           title: '就业市场',
           path: 'employment',
         },
-      ],
-      '/course/basis/': [
-        {
-          title: '计算机通识',  
-          collapsable: false, 
-          children: [
-           {
-            title: '网络知识', 
-            collapsable: false, 
-            path: 'network',
-           },
-           {
-            title: '数据结构', 
-            collapsable: false, 
-            path: 'data',
-           },
-           {
-            title: '算法篇', 
-            collapsable: false, 
-            path: 'alg',
-           },
-           {
-            title: 'git篇', 
-            collapsable: false, 
-            path: 'git',
-           }
-          ]
-        }
-      ],
-      '/course/hcj/':[
-        {
-          title: '入门三板斧',  
-          collapsable: false, 
-          children: [
-           {
-            title: 'HtmlCss', 
-            collapsable: false, 
-            path: 'htmlcss',
-           },
-           {
-            title: 'es3', 
-            collapsable: false, 
-            path: 'es3',
-           },
-           {
-            title: 'es6', 
-            collapsable: false, 
-            path: 'es6',
-           }
-          ]
-        }
-      ],
-      '/course/frame/':[
-        {
-          title: '流行框架',  
-          collapsable: false, 
-          children: [
-            {
-             title: 'vue', 
-             collapsable: false, 
-             path: 'vue',
-            },
-            {
-             title: 'reat', 
-             collapsable: false, 
-             path: 'react',
-            }
-          ]
-        }
       ],
       '/course/tool/':[
         {
@@ -221,20 +155,163 @@ module.exports = {
           collapsable: false, 
           children: [
            {
-            title: '图标(echarts)', 
+            title: '软件工程', 
             collapsable: false, 
-            path: 'echarts',
+            path: 'software',
            }
           ]
         }
       ],
       '/others/financial/':[
         {
-          title: '小白理财12天总结',  
+          title: '理财知识',  
           collapsable: false, 
-          path: 'start12',
+          children: [
+            {
+            title: '小白洗脑总结', 
+            collapsable: false, 
+            path: 'start'
+            }
+          ]
         }
-      ]
+      ],
+      '/others/readingBlog/':[
+        {
+          title: '书影博客',  
+          collapsable: false, 
+          children: [
+            // {
+            // title: '小白洗脑总结', 
+            // collapsable: false, 
+            // path: 'start'
+            // }
+          ]
+        }
+      ],
+      // 子页面分流菜单导航
+      '/course/main/base/':[
+        {
+          title: '基础知识', 
+          collapsable: false, 
+          path: 'base'
+         }
+      ],
+      '/course/main/es6/':[
+        {
+          title: 'ECMAScript 6',  
+          collapsable: false, 
+          children: [
+            {
+            title: '前言', 
+            collapsable: false, 
+            path: 'read'
+            },
+           {
+            title: 'ECMAScript 6 简介', 
+            collapsable: false, 
+            path: 'intro'
+           },
+           {
+            title: 'Set数据结构', 
+            collapsable: false, 
+            path: 'Set'
+           },
+           {
+            title: 'Map数据结构', 
+            collapsable: false, 
+            path: 'Map'
+           },
+           {
+            title: 'Proxy对象', 
+            collapsable: false, 
+            path: 'Proxy'
+           },
+           {
+            title: 'Reflect对象', 
+            collapsable: false, 
+            path: 'Reflect'
+           },
+           
+          ]
+        }
+      ],
+      '/course/main/Vue/':[
+        {
+          title: 'Vue',  
+          collapsable: false, 
+          children: [
+            {
+             title: 'vue', 
+             collapsable: false, 
+             path: 'vue',
+            }
+          ]
+        }
+      ],
+      '/course/main/general/':[
+        {
+          title: '计算机通识',  
+          collapsable: false, 
+          path:'network',
+          children: [
+            {
+             title: '网络', 
+             collapsable: false, 
+             path: 'network'
+            },
+            {
+              title: '数据结构', 
+              collapsable: false, 
+              path: 'data'
+             },
+             {
+              title: '算法篇', 
+              collapsable: false, 
+              path: 'alg'
+             },
+             {
+              title: 'git篇', 
+              collapsable: false, 
+              path: 'git'
+             },
+             {
+              title: '正则篇', 
+              collapsable: false, 
+              path: 'regExp'
+             }
+          ]
+        }
+      ],
+      '/course/main/designMode/':[
+        {
+          title: 'Javascript设计模式',  
+          collapsable: false, 
+          children: [
+           {
+            title: '简介', 
+            collapsable: false, 
+            path: 'intro'
+           },
+           {
+            title: '设计原则', 
+            collapsable: false, 
+            path: 'principle'
+           },
+           {
+            title: '设计模式', 
+            collapsable: false, 
+            path: 'model'
+           }
+          ]
+        }
+      ],
+      '/course/main/skills/':[
+        {
+          title: '编程技巧', 
+          collapsable: false, 
+          path: 'skills'
+         }
+      ],
     },
     lastUpdated: 'Last Updated', // string | boolean
   },
