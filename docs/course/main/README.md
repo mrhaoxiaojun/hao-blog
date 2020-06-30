@@ -26,3 +26,5 @@
 [白丁 - Javascript设计模式](/course/main/designMode/intro)
 
 [白丁 - 编程技巧](/course/main/skills/skills)
+
+[白丁 - linux实战笔记](/course/main/linux/base)
