@@ -17,7 +17,7 @@
 
 [白丁 - 算法篇](/course/main/general/alg)
 
-[白丁 - GIT篇](/course/main/general/git)
+[白丁 - GIT篇](/course/main/git/intro)
 
 [白丁 - 正则篇](/course/main/general/regExp)
 

@@ -282,6 +282,49 @@ module.exports = {
           ]
         }
       ],
+      '/course/main/git/':[
+        {
+          title: 'git教程',  
+          collapsable: false, 
+          children: [
+             {
+              title: 'git基础', 
+              collapsable: false, 
+              path: 'intro'
+             },
+             {
+              title: '穿越（修改）管理', 
+              collapsable: false, 
+              path: 'through'
+             },
+             {
+              title: '分支管理', 
+              collapsable: false, 
+              path: 'branch'
+             },
+             {
+              title: '标签管理', 
+              collapsable: false, 
+              path: 'tag'
+             },
+             {
+              title: 'Github介绍', 
+              collapsable: false, 
+              path: 'github'
+             },
+             {
+              title: 'gitLab介绍', 
+              collapsable: false, 
+              path: 'gitlab'
+             },
+             {
+              title: '常见问题', 
+              collapsable: false, 
+              path: 'queston'
+             }
+          ]
+        }
+      ],
       '/course/main/designMode/':[
         {
           title: 'Javascript设计模式',  

@@ -12,7 +12,7 @@
 
 ### 概要
 
-```js
+```sh
 git tag [-a | -s | -u <keyid>] [-f] [-m <msg> | -F <file>] [-e]
 	<tagname> [<commit> | <object>]
 git tag -d <tagname>…​
@@ -24,7 +24,7 @@ git tag -v [--format=<format>] <tagname>…​
 ```
 ### 常用速查
 
-```js
+```sh
 // 查看标签,可加上参数-l(列表形式列出） -n(附加说明)
 git tag [-l -n]
 // 查看符合检索条件的标签 
@@ -54,7 +54,7 @@ git fetch origin tag "标签名称"
 ### 创建标签
 在Git中打标签非常简单，首先，切换到需要打标签的分支上：
 
-```js
+```sh
 $ git branch
 * dev
   master
@@ -67,20 +67,20 @@ Switched to branch 'master'
 1、创建轻量标签
 轻量标签指向一个发行版的分支，其只是一个像某commit的引用，不存储名称时间戳及标签说明等信息。定义方法如下
 
-```js
+```sh
  git tag <版本号>-light
 ```
 
 2、创建带附注标签
 相对于轻量标签，附注标签是一个独立的标签对象，包含了名称时间戳以及标签备注等信息，同时指向对应的commit。定义方法如下
 
-```js
+```sh
 git tag -a <版本号> -m "<备注信息>"
 ```
 
 3、同时我们也可以像特定的commit添加标签，使用该commit对应的SHA值即可
 
-```js
+```sh
 git tag -a <版本号> <SHA值> -m "<备注信息>"
 ```
 
@@ -93,7 +93,7 @@ git tag -a <版本号> <SHA值> -m "<备注信息>"
 
 可以用命令`git tag`查看所有标签：
 
-```js
+```sh
 $ git tag
 v1.0
 
@@ -103,7 +103,7 @@ v1.0
 
 方法是找到历史提交的commit id，然后打上就可以了：
 
-```js
+```sh
 $ git log --pretty=oneline --abbrev-commit
 12a631b (HEAD -> master, tag: v1.0, origin/master) merged bug fix 101
 4c805e2 fix bug 101
@@ -125,13 +125,13 @@ eaadf4e wrote a readme file
 
 比方说要对`add merge`这次提交打标签，它对应的commit id是`f52c633`，敲入命令：
 
-```js
+```sh
 $ git tag v0.9 f52c633
 ```
 
 再用命令`git tag`查看标签：
 
-```js
+```sh
 $ git tag
 v0.9
 v1.0
@@ -139,7 +139,7 @@ v1.0
 
 注意，标签不是按时间顺序列出，而是按字母排序的。可以用`git show `查看标签信息：
 
-```js
+```sh
 $ git show v0.9
 commit f52c63349bc3c1593499807e5c8e972b82c8f286 (tag: v0.9)
 Author: xxx <xxx@gmail.com>
@@ -155,13 +155,13 @@ diff --git a/readme.txt b/readme.txt
 
 还可以创建带有说明的标签，用`-a`指定标签名，`-m`指定说明文字：
 
-```js
+```sh
 $ git tag -a v0.1 -m "version 0.1 released" 1094adb
 ```
 
 用命令`git show `可以看到说明文字：
 
-```js
+```sh
 $ git show v0.1
 tag v0.1
 Tagger: xxx <xxx@gmail.com>
@@ -183,7 +183,7 @@ diff --git a/readme.txt b/readme.txt
 
 如果标签打错了，也可以删除：
 
-```js
+```sh
 $ git tag -d v0.1
 Deleted tag 'v0.1' (was f15b0dd)
 
@@ -195,7 +195,7 @@ Deleted tag 'v0.1' (was f15b0dd)
 
 如果要推送某个标签到远程，使用命令`git push origin `：
 
-```js
+```sh
 $ git push origin v1.0
 Total 0 (delta 0), reused 0 (delta 0)
 To github.com:michaelliao/learngit.git
@@ -205,7 +205,7 @@ To github.com:michaelliao/learngit.git
 
 或者，一次性推送全部尚未推送到远程的本地标签：
 
-```js
+```sh
 $ git push origin --tags
 Total 0 (delta 0), reused 0 (delta 0)
 To github.com:michaelliao/learngit.git
@@ -216,14 +216,14 @@ To github.com:michaelliao/learngit.git
 
 如果标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除：
 
-```js
+```sh
 $ git tag -d v0.9
 Deleted tag 'v0.9' (was f52c633)
 ```
 
 然后，从远程删除。删除命令也是push，但是格式如下：
 
-```js
+```sh
 $ git push origin :refs/tags/v0.9
 To github.com:michaelliao/learngit.git
  - [deleted]         v0.9
