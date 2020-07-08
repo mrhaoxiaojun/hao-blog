@@ -201,7 +201,11 @@ nothing to commit, working tree clean
 如果还想要本地修改那么 `git reset --soft  HEAD^ `
 
 commit 和 add 是可以一起使用，也就是说不经过暂存区直接放到本地版本库中
+
 `git -am "提交描述"`
+`-a`, --all commit all changed files(提交所有被修改的文件)
+`-m` 是message 
+缺点：你有新添加的文件这条命令就不适用
 
 ### push 命令
 ```sh
@@ -225,43 +229,212 @@ git fetch
 # merge
 git merge
 ```
-## 版本回退
+## 查、退、改、删、撤
+Git也是一样，每当你觉得文件修改到一定程度的时候，就可以“保存一个快照”，这个快照在Git中被称为commit。一旦你把文件改乱了，或者误删了文件，还可以从最近的一个commit恢复，然后继续工作，而不是把几个月的工作成果全部丢失。
+
+那么当我们需要回退的时候，就可以很方便了
 
 ### log历史查询
 
-```sh
+`git log`命令显示从最近到最远的提交日志
 
-```
+#### 常用组合命令
 
-```sh
+* `git log --all `查看所有分支的历史
+* `git log --all --graph` 查看图形化的 log 地址
+* `git log --oneline` 查看单行的简洁历史。
+* `git log --oneline -n4` 查看最近的四条简洁历史。
+* `git log --oneline --all -n4 --graph` 查看所有分支最近 4 条单行的图形化历史。
+* `git help --web log` 跳转到git log 的帮助文档网页
+* `git log  --author=作者`
 
-```
-
-```sh
-#如果出现:将不必要的文件commit 或者 上次提交觉得是错的  或者 不想改变暂存区内容，只是想调整提交的信息
-```
-
-```sh
-
-```
+可以通过命令帮助查任何git命令选项，也可以去官方文档查看
 
 ```sh
+λ git log
+commit 8c4957c1a44502d04fa261eecb6bdb1f5f7be89a
+Author: haoxj <haoxiaojun@cnpc.com.cn>
+Date:   Tue Jul 7 15:04:03 2020 +0800
 
+    test
+
+commit 346c632c95ea0354b82710bc735d4158577f3ae0
+Merge: ad7e54a 120e54b
+Author: mawenli <18234832141@163.com>
+Date:   Wed Nov 27 10:34:14 2019 +0800
+
+    Merge branch 'develop' of http://11.11.156.40/CGIS/CentGISSite into develop
+
+commit ad7e54a7998e5091267fa741efe9ebff1fc513bb
+Author: mawenli <18234832141@163.com>
+Date:   Wed Nov 27 10:33:19 2019 +0800
+
+    图片替换
+
+commit 120e54b439326983f9000076386e3a3f0dce9004
+Merge: 452e0f8 5e9894a
+Author: liuzhonghui01 <liuzhonghui01@cnpc.com.cn>
+Date:   Mon Nov 25 09:58:18 2019 +0800
+
+    Merge branch 'develop' into eme-new
+
+commit 452e0f8791454992d05b03ffb3d15c5ca1b12451
+Merge: e7a6769 165e1a3
 ```
+如果嫌输出信息太多，看得眼花缭乱的，可以试试加上`--oneline`参数：
 
 ```sh
-
+λ git log --oneline
+8c4957c test
+346c632 Merge branch 'develop' of http://11.11.156.40/CGIS/CentGISSite into develop
+ad7e54a 图片替换
+120e54b Merge branch 'develop' into eme-new
+452e0f8 Merge remote-tracking branch 'origin/eme-new' into eme-new
+e7a6769 1、调整应急部分法语翻译 2、调整事故信息展示
+5e9894a 气泡样式
+165e1a3 Merge branch 'develop' into eme-new
 ```
+你看到的一大串类似`d56d596...`的是`commit id`（版本号），和SVN不一样，Git的`commit id`不是1，2，3……递增的数字，而是一个SHA1计算出来的一个非常大的数字，用十六进制表示，而且你看到的`commit id`和我的肯定不一样，以你自己的为准。为什么`commit id`需要用这么一大串数字表示呢？因为Git是分布式的版本控制系统，后面我们还要研究多人在同一个版本库里工作，如果大家都用1，2，3……作为版本号，那肯定就冲突了。
+
+### 版本回退
+
+首先，Git必须知道当前版本是哪个版本，在Git中，用`HEAD`表示当前版本，也就是最新的提交`d56d596...`（注意我的提交ID和你的肯定不一样），上一个版本就是`HEAD^`，上上一个版本就是`HEAD^^`，当然往上100个版本写100个^比较容易数不过来，所以写成`HEAD~100`。
 
 ```sh
-
+λ git reset --hard 346c632c95ea
+HEAD is now at 346c632 Merge branch 'develop' of http://11.11.156.40/CGIS/CentGISSite into develop
 ```
+这就回去了，你也可以 hard 后面直接加`commit id` 回退到指定版本
+
+Git的版本回退速度非常快，因为Git在内部有个指向当前版本的`HEAD`指针，当你回退版本的时候，Git仅仅是把`HEAD`从指向你的`commit id`对应的提交版本
+
+然后顺便把工作区的文件更新了。所以你让`HEAD`指向哪个版本号，你就把当前版本定位在哪。
+
+现在，你回退到了某个版本，关掉了电脑，第二天早上就后悔了，想恢复到新版本怎么办？找不到新版本的`commit id`怎么办？
+
+在Git中，总是有后悔药可以吃的。当你用`$ git reset --hard HEAD^`回退到上一个版本时，再想恢复到回去，就必须找到被重置了的`commit id`。Git提供了一个命令`git reflog`用来记录你的每一次命令：
 
 ```sh
-
+λ git reflog
+346c632 HEAD@{0}: reset: moving to 346c632c95ea
+8c4957c HEAD@{1}: commit: test
+346c632 HEAD@{2}: reset: moving to HEAD^
+9176eec HEAD@{3}: reset: moving to HEAD
+9176eec HEAD@{4}: commit: test
+346c632 HEAD@{5}: pull: Fast-forward
+120e54b HEAD@{6}: checkout: moving from master to develop
+7161f76 HEAD@{7}: checkout: moving from develop to master
 ```
+可以看到commit为test的`commit id` 我们直接 `git reset --hard 8c4957c` 发现回来了，大功告成
+
+**总结**
+* HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令`git reset --hard commit_id`。
+* 穿梭前，用`git log`可以查看提交历史，以便确定要回退到哪个版本。
+* 要重返未来，用`git reflog`查看命令历史，以便确定要回到未来的哪个版本。
+
+### 修改对比
+
+#### 比较提交 - Git Diff
+你可以用 git diff 来比较项目中任意两个版本的差异。
+
+`$ git diff master..test`
+上面这条命令只显示两个分支间的差异，如果你想找出‘master’,‘test’的共有 父分支和'test'分支之间的差异，你用3个‘.'来取代前面的两个'.' 。
+
+`$ git diff master...test`
+`git diff` 是一个难以置信的有用的工具，可以找出你项目上任意两点间 的改动，或是用来查看别人提交进来的新分支。
+
+#### 哪些内容会被提交(commit)
+你通常用git diff来找你当前工作目录和上次提交与本地索引间的差异。
+
+`$ git diff`
+上面的命令会显示在当前的工作目录里的，没有 staged(添加到索引中)，且在下次提交时 不会被提交的修改。
+
+如果你要看在下次提交时要提交的内容(staged,添加到索引中),你可以运行：
+
+`$ git diff --cached`
+上面的命令会显示你当前的索引和上次提交间的差异；这些内容在不带"-a"参数运行 "git commit"命令时就会被提交。
+
+`$ git diff filename`
+上面这条命令会显示你工作目录的filename文件与上次提交时之间的所有差别
+
+#### 更多的比较选项
+如果你要查看当前的工作目录与另外一个分支的差别，你可以用下面的命令执行:
+
+`$ git diff test`
+这会显示你当前工作目录与另外一个叫'test'分支的差别。你也以加上路径限定符，来只 比较某一个文件或目录。
+
+`$ git diff HEAD -- ./lib `
+上面这条命令会显示你当前工作目录下的lib目录与上次提交之间的差别(或者更准确的 说是在当前分支)。
+
+如果不是查看每个文件的详细差别，而是统计一下有哪些文件被改动，有多少行被改 动，就可以使用`--stat` 参数
+
+`$ git diff HEAD`
+显示工作目录(已track但未add文件)和暂存区(已add但未commit文件)与最后一次commit之间的的所有不相同文件的增删改。
+
+### 撤销修改
+
+当年修改了一个文件
+```sh
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+你可以发现，Git会告诉你，git checkout -- file可以丢弃工作区的修改：
+```sh
+$ git checkout -- readme.txt
+```
+命令`git checkout -- readme.txt`意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：
+
+一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+
+一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+
+总之，就是让这个文件回到最近一次`git commit`的状态。
+
+`git checkout -- file`命令中的--很重要，没有--，就变成了“切换到另一个分支”的命令，我们在后面的分支管理中会再次遇到`git checkout`命令
+事实上经过实践，如果`git chekout `后面跟着路径+文件名，会启动同样效果，不会切换分支，因为本地并没有这个分支，而任务你是在做撤销命令
+
+### 删除文件
+
+一般情况下，你通常直接在文件管理器中把没用的文件删了，或者用rm命令删了：
 
 ```sh
-
+$ rm test.txt
 ```
+这个时候，Git知道你删除了文件，因此，工作区和版本库就不一致了，`git status`命令会立刻告诉你哪些文件被删除了：
+```sh
+λ git status
+On branch develop
+Your branch is up-to-date with 'origin/develop'.
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        deleted:    a.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+现在你有两个选择，一是确实要从版本库中删除该文件，那就用命令git rm删掉，并且git commit：
+
+```sh
+$ git rm test.txt
+rm 'a.txt'
+
+$ git commit -m "remove a.txt"
+[master d46f35e] remove a.txt
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 a.txt
+```
+另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：
+
+```sh
+git checkout a.txt
+```
+命令git rm用于删除一个文件。如果一个文件已经被提交到版本库，那么你永远不用担心误删，但是要小心，你只能恢复文件到最新版本，你会丢失最近一次提交后你修改的内容。
 

@@ -18,16 +18,6 @@ module.exports = {
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
-      // {
-      //   text: '为什么',
-      //   items: [
-      //     { text: '市场行情大背景', link: '/why/back' },
-      //     { text: '那为什么选择我们', link: '/why/choose' },
-      //     { text: '师资力量怎么样', link: '/why/teacher' },
-      //     { text: '我们只做前端', link: '/why/onlyone' },
-      //     { text: '就业市场', link: '/why/employment' }
-      //   ]
-      // },
       {
         text: '课程指南',
         items: [
@@ -52,29 +42,6 @@ module.exports = {
     },
     sidebar: {
       // 头部导航菜单
-      // '/why/': [
-      //   {
-      //     title: '市场行情大背景',   // 必要的
-      //     path: 'back',      // 可选的, 应该是一个绝对路径
-      //     collapsable: false, // 可选的, 默认值是 true,
-      //   },
-      //   {
-      //     title: '那为什么选择我们',
-      //     path: 'choose',
-      //   },
-      //   {
-      //     title: '师资力量怎么样',
-      //     path: 'teacher',
-      //   },
-      //   {
-      //     title: '我们只做前端',
-      //     path: 'onlyone',
-      //   },
-      //   {
-      //     title: '就业市场',
-      //     path: 'employment',
-      //   },
-      // ],
       '/course/tool/':[
         {
           title: '辅助工具',  
@@ -284,11 +251,11 @@ module.exports = {
       ],
       '/course/main/git/':[
         {
-          title: 'git教程',  
+          title: 'Git 教程',  
           collapsable: false, 
           children: [
              {
-              title: 'git基础', 
+              title: 'Git 基础', 
               collapsable: false, 
               path: 'intro'
              },
