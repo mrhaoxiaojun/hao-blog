@@ -208,49 +208,480 @@ Merge made by the 'recursive' strategy.
 ![git-br-policy](./imgs/git-br-policy.png)
 
 ### Bug 分支
-软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，所以，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
+软件开发中，`bug`就像家常便饭一样。有了`bug`就需要修复，在Git中，由于分支是如此的强大，所以，每个`bug`都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
 
-当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支issue-101来修复它，但是，等等，当前正在dev上进行的工作还没有提交：
+当你接到一个修复一个代号01的`bug`的任务时，很自然地，你想创建一个分支`bug-01`来修复它，但是，等等，当前正在`dev`上进行的工作还没有提交：
 
 并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
 
-幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+幸好，`Git`还提供了一个`stash`功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
 
 ```sh
 $ git stash
 Saved working directory and index state WIP on dev: f52c633 add merge
 ```
+现在，用`git status`查看工作区，就是干净的，现在可以切换分支或者创建bug分支了
+
+比如我要在`master`分支打补丁，那就要`git checout master` 然后 `git checkout -b bug-01` 使用完分支做了`bug`需求上线后，你可以选择删了`bug`分支，也可以预留后期再说
+
+good，我们改完bug，后回到dev分支继续干活 `git checkut dev`
+
 ```sh
+$ git status
+On branch dev
+nothing to commit, working tree clean
 ```
+工作区是干净的，刚才的工作现场存到哪去了？用`git stash list`命令看看：
+
 ```sh
+$ git stash list
+stash@{0}: WIP on dev: f52c633 add merge
 ```
+工作现场还在，`Git`把`stash`内容存在某个地方了，但是需要恢复一下，有两个办法：
+
+* 一是用`git stash apply`恢复，但是恢复后，`stash`内容并不删除(如果有反复需要使用的场景可以使用)，你需要用`git stash drop`来删除；
+
+* 另一种方式是用`git stash pop`（通常我们用这个），恢复的同时把stash内容也删了
+
 ```sh
+$ git stash pop
+On branch dev
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   hello.py
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
+
+Dropped refs/stash@{0} (5d677e2ee266f39ea296182fb2354265b91b3b2a)
 ```
+再用`git stash list`查看，就看不到任何stash内容了：
+
+你可以多次stash，恢复的时候，先用`git stash list`查看，然后恢复指定的stash，用命令：
+
 ```sh
+$ git stash apply stash@{0}
+
 ```
+
+在`master`分支上修复了`bug`后，我们要想一想，`dev`分支是早期从`master`分支分出来的，所以，这个`bug`其实在当前dev分支上也存在。
+
+那怎么在dev分支上修复同样的`bug`？重复操作一次，提交不就行了？
+
+这个太傻了，指定不行
+
+我们可以吧`master`分支的代码，更新到`dev`分支一下
+
 ```sh
+git pull origin master
+# 相当于master被merge到了dev
 ```
+但如果我不是把整个`master`分支`merge`过来呢
+
+为了方便操作，`Git`专门提供了一个cherry-pick命令，让我们能复制一个特定的提交到当前分支（真是够牛，瞌睡了送枕头）：
+
 ```sh
+$ git branch
+* dev
+  master
+$ git cherry-pick 4c805e2
+[master 1d4b803] fix bug 101
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 ```
+`4c805e2` 你需要`git log`去查一下那个需要合并过来的`commit id`
+
+不过我通常使用`merge`处理
+
+### 删除分支
+
+普通删除 `git branch -d <name>`
+
 ```sh
+$ git branch -d bug-01
+error: The branch 'bug-01' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D bug-01'.
 ```
+如上代码，发现有时候们删除不了，但是Git友情提醒，bug-01分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的-D参数。
+
 ```sh
+$ git branch -D bug-01
+Deleted branch bug-01 (was 287773e).
 ```
+完美
+
+## 多人协作
+当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。
+
+要查看远程库的信息，用git remote：
 ```sh
+$ git remote
+origin
 ```
+或者，用git remote -v显示更详细的信息：
+
 ```sh
+$ git remote -v
+origin  git@github.com:michaelliao/learngit.git (fetch)
+origin  git@github.com:michaelliao/learngit.git (push)
 ```
+上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
+
+推送分支和抓取分支的命令还有产生冲突的命令和演示，文中都有讲解，这里就直接讲，多人协作流程和遇到冲突怎么解决了
+
+实际开发中多人协作的工作模式通常是这样：
+
+1. 首先，可以试图用`git push origin <branch-name>`推送自己的修改；
+
+2. 如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+
+3. 如果合并有冲突，则解决冲突，并在本地提交；
+
+4. 没有冲突或者解决掉冲突后，再用`git push origin <branch-name>`推送就能成功！
+
+如果`git pull`提示`no tracking information`，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to <branch-name> origin/<branch-name>`。
+
+这就是多人协作的工作模式，每天都要这么去做，一旦熟悉很简单，但它同样很重要，同样再次说明，冲突在自己的分支解决
+
+
+### rebase
+Git有一种称为rebase的操作，有人把它翻译成“变基”。
+
+git rebase能够将分叉的分支重新合并，下面主要介绍它的两个使用场景：
+
+#### 场景一：本地与远端同一分支提交历史不一致
+
+**方式一**
+
+多个人在同一个分支上协作时，出现冲突是很正常的，比如现在有一个项目由我和A一同开发。
+
+我在修复了一个bug以后准备提交
+
 ```sh
+HowiedeiMac:ganlin howie$ git add models/paper.go
+HowiedeiMac:ganlin howie$ git commit -m 'fix a bug'
+[master 8b76654] fix a bug
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 ```
+现在准备推送到远端
+
 ```sh
+HowiedeiMac:ganlin howie$ git push origin master
+To https://gitee.com/greenhn/ganlin.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'https://gitee.com/greenhn/ganlin.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 ```
+
+`push`失败了，说明A在我之前已经提交了，我本地master分支的提交历史已经落后远端了，需要先`pull`一下，与远端同步后才能`push`
+
 ```sh
+HowiedeiMac:ganlin howie$ git pull
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 6), reused 0 (delta 0)
+Unpacking objects: 100% (8/8), done.
+From https://gitee.com/greenhn/ganlin
+   a1bc60a..b91f711  master     -> origin/master
+Merge made by the 'recursive' strategy.
+ controllers/deal_local_data.go | 14 +++++++++++---
+ controllers/rtu_interface.go   |  8 ++++----
+ models/instrument_type.go      |  3 +++
+ models/rtu_interface.go        |  3 +++
+ 4 files changed, 21 insertions(+), 7 deletions(-)
+ ```
+
+`pull`成功，现在使用`git log`看下一提交历史：
+
+```sh
+HowiedeiMac:ganlin howie$ git log --oneline --graph
+*   f63ecbf (HEAD -> master) Merge branch 'master' of https://gitee.com/greenhn/ganlin
+|\  
+| * b91f711 (origin/master, origin/HEAD) 修正bug，优化内置通道配置
+* | 8b76654 fix a bug
+|/  
+* a1bc60a 完善日报接口
+* 9f73b5e 增加内置通道设置功能
+* a0d464e ...
 ```
+
+竟然分叉了！由于我本地master的提交历史和远端的master分支的提交历史不一致，所以git为我进行了自动合并，然后生成了一个新的提交历史（f63ecbf Merge branch 'master' of）
+
+对于部分强迫症来说这个不能接受的，不想看到分叉。
+
+这个时候用`git rebase`就可以解决
+
 ```sh
+HowiedeiMac:ganlin howie$ git rebase
+First, rewinding head to replay your work on top of it...
+Applying: fix a bug
 ```
+
+现在再查看一下提交历史：
+
 ```sh
+HowiedeiMac:ganlin howie$ git log --oneline --graph
+* 2e2b995 (HEAD -> master) fix a bug
+* b91f711 (origin/master, origin/HEAD) 修正bug，优化内置通道配置
+* a1bc60a 完善日报接口
+* 9f73b5e 增加内置通道设置功能
+* a0d464e ...
 ```
+
+完美解决，现在再`push`推送到远端：
+
 ```sh
+HowiedeiMac:ganlin howie$ git push origin master
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 394 bytes | 394.00 KiB/s, done.
+Total 4 (delta 3), reused 0 (delta 0)
+remote: Powered By Gitee.com
+To https://gitee.com/greenhn/ganlin.git
+   b91f711..2e2b995  master -> master
 ```
+
+再次查看提交历史
+
 ```sh
+HowiedeiMac:ganlin howie$ git lg --oneline --graph
+* 2e2b995 (HEAD -> master, origin/master, origin/HEAD) fix a bug
+* b91f711 修正bug，优化内置通道配置
+* a1bc60a 完善日报接口
+* 9f73b5e 增加内置通道设置功能
+* a0d464e ...
+```
+
+现在远端`master`，远端`head`，本地`master`全部统一，问题解决。
+
+**方式二**
+
+直接执行：
+`git pull --rebase`
+
+效果与上面是一致的，推荐使用
+
+#### 场景二：不同分支之间的合并
+由于老板突发奇想，要求开发一个新的功能。
+
+先创建一个分支用于开发新功能：
+
+```sh
+HowiedeiMac:hello howie$ git checkout -b feature
+Switched to a new branch 'feature'
+HowiedeiMac:hello howie$ git branch
+* feature
+  master
+```
+接下来修改newFunc.go，增加新的功能,并且保存提交
+
+`vim newFunc.go`
+
+`git add newFunc.go`
+
+`git commit -m 'add new func'`
+
+现在查看一下提交
+
+```sh
+HowiedeiMac:hello howie$ git log --oneline --graph
+* 4f58ab8 (HEAD -> feature) add new func
+* 94c134b (master) init base
+
+HowiedeiMac:hello howie$ git branch
+* feature
+  master
+```
+
+现在新功能开发完毕，需要将它合并的主分支中。
+
+先尝试通过`merge`合并：
+
+首先切换到`master`分支
+
+```sh
+HowiedeiMac:hello howie$ git checkout master
+Switched to branch 'master'
+Your branch is up to date with 'origin/master'.
+```
+直接合并feature分支
+
+```sh
+HowiedeiMac:hello howie$ git merge feature
+Auto-merging newFunc.go
+CONFLICT (content): Merge conflict in newFunc.go
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+失败了，说明我两个分支之前的版本已经不同步了，需要手动合并冲突，再提交：
+
+先查看冲突文件：`git status`
+
+```sh
+HowiedeiMac:hello howie$ git status
+On branch master
+Your branch is ahead of 'origin/master' by 7 commits.
+  (use "git push" to publish your local commits)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+
+        both modified:   newFunc.go
+```
+
+打开文件，进行修改
+
+原文件：
+```js
+func NewFunc() {
+<<<<<<< HEAD
+=======
+    fmt.Println("add new func")
+>>>>>>> feature
+}
+修改后：
+
+func NewFunc() {
+    fmt.Println("add new func")
+}
+```
+现在通过add添加，然后commit提交
+
+```sh
+HowiedeiMac:hello howie$ git add newFunc.go
+
+HowiedeiMac:hello howie$ git commit -m 'merge master and feature'
+[master 562ec58] merge master and feature
+```
+
+现在在查看一下分支提交历史：
+
+```sh
+HowiedeiMac:hello howie$ git log --oneline --graph
+*   562ec58 (HEAD -> master) merge master and feature
+|\  
+| * 4f58ab8 (feature) add new func
+* | 0e80f97 do something
+|/  
+* 94c134b init base
+```
+虽然合并成功，但是Master已经保存了合并历史，出现开叉了！对于强迫症患者来说肯定是不能接受的。
+
+通过rebase合并分支：
+
+现在将版本退回到合并前,也就是回退一个版本
+
+`git reset --hard head^`
+
+退回去了，现在是位于`master`分支的`init base`提交这里。
+
+先切换回`feature`分支：
+
+在feature分支上执行: `git rebase master`
+
+这句命令的意识是：以`master`为基础，将`feature`分支上的修改增加到`master`分支上，并生成新的版本。
+
+```sh
+HowiedeiMac:hello howie$ git rebase master
+First, rewinding head to replay your work on top of it...
+Applying: add new func
+Using index info to reconstruct a base tree...
+M       newFunc.go
+Falling back to patching base and 3-way merge...
+Auto-merging newFunc.go
+CONFLICT (content): Merge conflict in newFunc.go
+error: Failed to merge in the changes.
+Patch failed at 0001 add new func
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Resolve all conflicts manually, mark them as resolved with
+"git add/rm <conflicted_files>", then run "git rebase --continue".
+You can instead skip this commit: run "git rebase --skip".
+To abort and get back to the state before "git rebase", run "git rebase --abort".
+```
+
+
+失败了，原因很简单，两个分支修改个同一个文件，产生了冲突。所以先需要解决冲突：
+
+打开冲突的文件，解决冲突
+
+原文件：
+```js
+func NewFunc() {
+<<<<<<< HEAD
+=======
+    fmt.Println("add new func")
+>>>>>>> add new func
+}
+修改后：
+
+func NewFunc() {
+    fmt.Println("add new func")
+}
+```
+现在通过`add`添加
+
+现在是重点，之前的`rebase`其实只是完成了一半，由于出现冲突而终止，现在冲突解决，可以通过`git rebase —continue`继续完成之前的`rebase`操作。
+
+```sh
+HowiedeiMac:hello howie$ git rebase --continue
+Applying: add new func
+```
+`rebase`完成，再查看一下提交历史：
+
+```sh
+HowiedeiMac:hello howie$ git log --oneline --graph
+* b2593e6 (HEAD -> feature) add new func
+* 0e80f97 (master) do something
+* 94c134b init base
+```
+提交记录已经是一条完美的直线。现在切换到主分支master，将feather分支上的提交合并过来。
+
+`git checkout master`
+
+`git merge feature`
+
+```sh
+HowiedeiMac:hello howie$ git checkout master
+Switched to branch 'master'
+Your branch is ahead of 'origin/master' by 7 commits.
+  (use "git push" to publish your local commits)
+
+
+HowiedeiMac:hello howie$ git merge feature
+Updating 0e80f97..b2593e6
+Fast-forward
+ newFunc.go | 1 +
+ 1 file changed, 1 insertion(+)
+```
+
+再次查看一下提交历史：
+
+```sh
+HowiedeiMac:hello howie$ git log --oneline --graph
+* b2593e6 (HEAD -> master, feature) add new func
+* 0e80f97 do something
+* 94c134b init base
+```
+问题解决，master上也是一条直线了。
+
+最后你可能希望删除掉feature分支：
+
+```sh
+HowiedeiMac:hello howie$ git branch -d feature
+Deleted branch feature (was b2593e6).
 ```

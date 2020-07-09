@@ -251,7 +251,7 @@ module.exports = {
       ],
       '/course/main/git/':[
         {
-          title: 'Git 教程',  
+          title: 'Git 简版教程',  
           collapsable: false, 
           children: [
              {
@@ -275,14 +275,9 @@ module.exports = {
               path: 'tag'
              },
              {
-              title: 'Github介绍', 
+              title: '相关工具介绍', 
               collapsable: false, 
-              path: 'github'
-             },
-             {
-              title: 'gitLab介绍', 
-              collapsable: false, 
-              path: 'gitlab'
+              path: 'tool'
              },
              {
               title: '常见问题', 
