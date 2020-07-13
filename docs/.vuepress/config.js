@@ -1,6 +1,6 @@
 module.exports = {
-  title: '佳航教育',
-  description: '你的问题主要在于读书不多而想得太多。——杨绛',
+  title: '白丁识书',
+  description: '你的问题主要在于读书不多而想得太多。—杨绛',
   head: [
       ['link', {
           rel: 'icon',
@@ -8,23 +8,39 @@ module.exports = {
       }]
   ],
   dest: './docs/.vuepress/dist',
-  ga: '',
+  // ga: '',
+  // 浏览器兼容性
   evergreen: true,
   markdown: {
     lineNumbers: true
   },
+  plugins: {
+    '@vuepress/back-to-top':true
+  },
   themeConfig: {
     sidebarDepth: 2, 
+    // // 选项来启用页面滚动效果
+    smoothScroll: true,
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
+      { text: '吸星大法', link: '/course/' },
       {
-        text: '课程指南',
+        text: '教程笔记',
         items: [
-          { text: '吸星大法', link: '/course/main/' },
-          { text: '辅助工具', link: '/course/tool/' },
-          { text: '面试指南', link: '/course/interview/' },
+          { text: 'Javascript设计模式-简版教程篇', link: '/course/mainFE/designMode/intro' },
+          { text: '正则-简版教程篇', link: '/course/general/regExp/regExp' },
+          { text: 'Git 简版教程篇', link: '/course/general/git/intro' },
+          { text: 'ECMAScript 6 收录笔记', link: '/course/mainFE/es6/read' },
+          { text: 'Linux实战-笔记篇', link: '/course/linux/base' }
+        ]
+      },
+      {
+        text: '拓展指南',
+        items: [
+          { text: '面试指南', link: '/course/interview/base' },
           { text: '源码解析', link: '/course/sourceCode/' },
+          { text: '辅助工具', link: '/course/tool/' },
           { text: '知识拓展', link: '/course/expand/' },
         ]
       },
@@ -37,11 +53,10 @@ module.exports = {
       },
       { text: 'Github', link: 'https://github.com/mrhaoxiaojun/' },
     ],
-    '/course/main/':{
+    '/course/':{
       sidebar:false
     },
     sidebar: {
-      // 头部导航菜单
       '/course/tool/':[
         {
           title: '辅助工具',  
@@ -77,20 +92,14 @@ module.exports = {
       ],
       '/course/interview/':[
         {
-          title: '面试指南',  
+          title: '基础面试', 
           collapsable: false, 
-          children: [
-            {
-              title: '基础面试', 
-              collapsable: false, 
-              path: 'base',
-            },
-            {
-              title: '进阶面试', 
-              collapsable: false, 
-              path: 'advance',
-            }
-          ]
+          path: 'base',
+        },
+        {
+          title: '进阶面试', 
+          collapsable: false, 
+          path: 'advance',
         }
       ],
       '/course/sourceCode/':[
@@ -155,15 +164,15 @@ module.exports = {
           ]
         }
       ],
-      // 子页面分流菜单导航
-      '/course/main/base/':[
+      // 前端相关
+      '/course/mainFE/base/':[
         {
           title: '基础知识', 
           collapsable: false, 
           path: 'base'
          }
       ],
-      '/course/main/es6/':[
+      '/course/mainFE/es6/':[
         {
           title: 'ECMAScript 6',  
           collapsable: false, 
@@ -202,20 +211,38 @@ module.exports = {
           ]
         }
       ],
-      '/course/main/Vue/':[
+      '/course/mainFE/designMode/':[
         {
-          title: 'Vue',  
+          title: 'Javascript设计模式',  
           collapsable: false, 
           children: [
-            {
-             title: 'vue', 
-             collapsable: false, 
-             path: 'vue',
-            }
+           {
+            title: '简介', 
+            collapsable: false, 
+            path: 'intro'
+           },
+           {
+            title: '设计原则', 
+            collapsable: false, 
+            path: 'principle'
+           },
+           {
+            title: '设计模式', 
+            collapsable: false, 
+            path: 'model'
+           }
           ]
         }
       ],
-      '/course/main/general/':[
+      '/course/mainFE/skills/':[
+        {
+          title: '编程技巧', 
+          collapsable: false, 
+          path: 'skills'
+         }
+      ],
+      // 计算机通识
+      '/course/general/':[
         {
           title: '计算机通识',  
           collapsable: false, 
@@ -235,21 +262,11 @@ module.exports = {
               title: '算法篇', 
               collapsable: false, 
               path: 'alg'
-             },
-             {
-              title: 'git篇', 
-              collapsable: false, 
-              path: 'git'
-             },
-             {
-              title: '正则篇', 
-              collapsable: false, 
-              path: 'regExp'
              }
           ]
         }
       ],
-      '/course/main/git/':[
+      '/course/general/git/':[
         {
           title: 'Git 简版教程',  
           collapsable: false, 
@@ -287,37 +304,8 @@ module.exports = {
           ]
         }
       ],
-      '/course/main/designMode/':[
-        {
-          title: 'Javascript设计模式',  
-          collapsable: false, 
-          children: [
-           {
-            title: '简介', 
-            collapsable: false, 
-            path: 'intro'
-           },
-           {
-            title: '设计原则', 
-            collapsable: false, 
-            path: 'principle'
-           },
-           {
-            title: '设计模式', 
-            collapsable: false, 
-            path: 'model'
-           }
-          ]
-        }
-      ],
-      '/course/main/skills/':[
-        {
-          title: '编程技巧', 
-          collapsable: false, 
-          path: 'skills'
-         }
-      ],
-      '/course/main/linux/':[
+      // 运维相关
+      '/course/linux/':[
         {
           title: 'linux实战笔记',  
           collapsable: false, 
@@ -356,7 +344,7 @@ module.exports = {
         }
       ],
     },
-    lastUpdated: 'Last Updated', // string | boolean
+    lastUpdated: '上次更新: ', // string | boolean
   },
   configureWebpack: {
     resolve: {
